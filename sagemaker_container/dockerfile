@@ -28,6 +28,8 @@ RUN apt-get update && \
     libopenblas-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Create a models directory
+RUN mkdir -p /models
 
 # Copy requirements.txt and install Python dependencies
 COPY requirements.txt ./requirements.txt
