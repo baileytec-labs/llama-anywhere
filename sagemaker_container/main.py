@@ -6,6 +6,7 @@ from starlette.responses import Response
 from llama_cpp import Llama
 from pydantic import BaseModel, validator
 from typing import Optional, List, Union
+import traceback
 
 MODELPATH=os.environ.get('MODELPATH')
 STAGE = os.environ.get('STAGE', None)
@@ -88,23 +89,29 @@ async def ping():
 
 @app.post("/invoke")
 async def invoke(llama_args: LlamaArguments):
-    if llm is not None:
-        output = llm(**llama_args.dict())  # Pass the parameters to Llama by unpacking the dictionary of arguments
-    else:
-        raise HTTPException(status_code=400, detail="Please configure the llm engine using /configure")
+    try:
+        if llm is not None:
+            output = llm(**llama_args.dict())  # Pass the parameters to Llama by unpacking the dictionary of arguments
+        else:
+            raise HTTPException(status_code=400, detail="Please configure the llm engine using /configure")
+    except:
+        output={"traceback_err":str(traceback.format_exc())}
     return output
 
 @app.post("/configure")
 async def configure(llama_model_args: LlamaModelConfig):
-    if llama_model_args.bucket and llama_model_args.key:
-        local_path = MODELPATH
-        download_from_s3(llama_model_args.bucket, llama_model_args.key, local_path)
-        llama_model_args.model_path = local_path
+    try:
+        if llama_model_args.bucket and llama_model_args.key:
+            local_path = MODELPATH
+            download_from_s3(llama_model_args.bucket, llama_model_args.key, local_path)
+            llama_model_args.model_path = local_path
 
-    elif not llama_model_args.model_path:
-        raise HTTPException(status_code=400, detail="Model path must be provided when S3 bucket and key are not specified")
+        elif not llama_model_args.model_path:
+            raise HTTPException(status_code=400, detail="Model path must be provided when S3 bucket and key are not specified")
 
-    global llm
-    llm = Llama(**llama_model_args.dict())  # Pass the parameters to Llama by unpacking the dictionary of arguments
-    return {"status": "success"}
+        global llm
+        llm = Llama(**llama_model_args.dict())  # Pass the parameters to Llama by unpacking the dictionary of arguments
+        return {"status": "success"}
+    except:
+        return {"traceback_err":str(traceback.format_exc())}
 

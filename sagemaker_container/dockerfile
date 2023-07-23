@@ -1,4 +1,4 @@
-FROM --platform=linux/x86-64 ubuntu:22.04
+FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND noninteractive
 
 # Use an official Python runtime based on Debian 10 "buster" as a parent image
