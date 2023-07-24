@@ -107,9 +107,9 @@ async def configure(llama_model_args: LlamaModelConfig):
 
         elif not llama_model_args.model_path:
             raise HTTPException(status_code=400, detail="Model path must be provided when S3 bucket and key are not specified")
-        for key in llama_model_args:
+        for key in llama_model_args.dict():
             if not "bucket" in str(key) or "key" in str(key):
-                finalargs[key]=llama_model_args[key]
+                finalargs[key]=llama_model_args.dict()[key]
         llama_model_args=None
         llama_model_args = finalargs
         global llm
