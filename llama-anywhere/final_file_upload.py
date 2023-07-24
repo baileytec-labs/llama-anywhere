@@ -17,6 +17,7 @@ c_handler = logging.StreamHandler()
 f_handler = logging.FileHandler('file.log')
 
 # Set level of logging
+logger.setLevel(logging.INFO)
 c_handler.setLevel(logging.INFO)
 f_handler.setLevel(logging.INFO)
 

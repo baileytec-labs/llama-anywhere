@@ -15,8 +15,6 @@ OPENAPI_PREFIX = f"/{STAGE}" if STAGE else "/"
 app = FastAPI(title="Sagemaker Endpoint LLM API", openapi_prefix=OPENAPI_PREFIX)
 llm = None #What we're going to do here is set up a simple system that allows you to specify any llama.cpp model you'd like. #Llama(model_path=MODELPATH, verbose=False)  # Instantiate the model at the beginning to make responses faster
 
-
-
 class LlamaModelConfig(BaseModel):
     model_path: Optional[str] = None
     bucket: Optional[str] = None
@@ -101,14 +99,19 @@ async def invoke(llama_args: LlamaArguments):
 @app.post("/configure")
 async def configure(llama_model_args: LlamaModelConfig):
     try:
+        finalargs={}
         if llama_model_args.bucket and llama_model_args.key:
             local_path = MODELPATH
             download_from_s3(llama_model_args.bucket, llama_model_args.key, local_path)
-            llama_model_args.model_path = local_path
+            llama_model_args.model_path = local_path            
 
         elif not llama_model_args.model_path:
             raise HTTPException(status_code=400, detail="Model path must be provided when S3 bucket and key are not specified")
-
+        for key in llama_model_args:
+            if not "bucket" in str(key) or "key" in str(key):
+                finalargs[key]=llama_model_args[key]
+        llama_model_args=None
+        llama_model_args = finalargs
         global llm
         llm = Llama(**llama_model_args.dict())  # Pass the parameters to Llama by unpacking the dictionary of arguments
         return {"status": "success"}
