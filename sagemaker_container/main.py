@@ -113,7 +113,7 @@ async def configure(llama_model_args: LlamaModelConfig):
         llama_model_args=None
         llama_model_args = finalargs
         global llm
-        llm = Llama(**llama_model_args.dict())  # Pass the parameters to Llama by unpacking the dictionary of arguments
+        llm = Llama(**llama_model_args)  # Pass the parameters to Llama by unpacking the dictionary of arguments
         return {"status": "success"}
     except:
         return {"traceback_err":str(traceback.format_exc())}
