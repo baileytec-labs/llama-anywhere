@@ -33,6 +33,7 @@ logger.addHandler(c_handler)
 logger.addHandler(f_handler)
 
 STACKNAME='llama-anywhere'
+port="8080"
 
 
 
@@ -122,7 +123,7 @@ if bucket_name is not None:
     bucket_name = bucket_name['OutputValue']
 else:
     logger.info("BucketName not found in outputs")
-public_ip="http://"+get_public_ip(STACKNAME)
+public_ip="http://"+get_public_ip(STACKNAME)+":"+port
 # Now bucket_name contains the outputted bucket name
 logger.info(bucket_name)
 

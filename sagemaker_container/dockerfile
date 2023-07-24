@@ -38,7 +38,7 @@ COPY main.py .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Expose port for the FastAPI application to run on
-EXPOSE 80
+EXPOSE 8080
 
 # Start the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
