@@ -132,12 +132,13 @@ class LlamaAnywhereStack(Stack):
             connection=ec2.Port.tcp(portval),
             description="Allow HTTP access from current public IP"
         )
-
-        if 'Q' in DEPLOYTYPE.upper():
-            userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p 80:80 -d my-container"
-        if 'F' in DEPLOYTYPE.upper():
-            userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p 80:80 -d my-container",
-        # Define the user data to install Docker, git and other dependencies
+        userdataline=""
+        if DEPLOYTYPE is not None:
+            if 'Q' in DEPLOYTYPE.upper():
+                userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p 80:80 -d my-container"
+            if 'F' in DEPLOYTYPE.upper():
+                userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p 80:80 -d my-container",
+            # Define the user data to install Docker, git and other dependencies
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
             "yum update -y",
@@ -187,4 +188,4 @@ class LlamaAnywhereStack(Stack):
         cdk.CfnOutput(self,"DeployType",value=DEPLOYTYPE)
         cdk.CfnOutput(self,"InstanceType",value=instance_type)
         #gonna hardcode virginia here because the pricing sdk is limited, so I would prefer it working.
-        cdk.CfnOutput(self,"InstancePrice",value=get_on_demand_price(instance_type,'US East (N. Virginia)'))
+        cdk.CfnOutput(self,"InstancePrice",value=str(get_on_demand_price(instance_type,'US East (N. Virginia)')))
