@@ -1,0 +1,50 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND noninteractive
+
+
+ARG MODEL
+# Use an official Python runtime based on Debian 10 "buster" as a parent image
+# FROM python:3.10-slim-buster
+
+# Create a models directory
+RUN mkdir -p /models
+# Sets dumping log messages directly to stream instead of buffering
+ENV PYTHONUNBUFFERED=1
+# Set MODELPATH environment variable
+ENV MODEL_TYPE=$MODEL
+ENV SAVE_PATH="/models"
+
+# The working directory in the Docker image
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    g++ \
+    make \
+    cmake \
+    unzip \
+    libcurl4-openssl-dev \
+    python3 \
+    python3-pip \
+    python3-dev \
+    git \
+    libclblast-dev \
+    libopenblas-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+
+
+# Copy requirements.txt and install Python dependencies
+COPY requirements.txt ./requirements.txt
+COPY main.py .
+COPY prepare_huggingface_data.py .
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN python3 prepare_huggingface_data.py
+
+# Expose port for the FastAPI application to run on
+EXPOSE 8080
+
+# Start the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

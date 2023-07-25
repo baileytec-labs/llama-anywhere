@@ -1,0 +1,10 @@
+fastapi
+boto3
+starlette
+pydantic
+uvicorn
+torch
+transformers
+accelerator
+einops
+xformers

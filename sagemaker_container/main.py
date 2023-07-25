@@ -7,6 +7,9 @@ from llama_cpp import Llama
 from pydantic import BaseModel, validator
 from typing import Optional, List, Union
 import traceback
+import requests
+from urllib.parse import urlparse
+
 
 MODELPATH=os.environ.get('MODELPATH')
 STAGE = os.environ.get('STAGE', None)
@@ -46,12 +49,17 @@ class LlamaModelConfig(BaseModel):
             raise ValueError('All elements in the tensor_split list must be floats')
         return v
 
+class RoutePayload(BaseModel):
+    configure: bool
+    inference: bool
+    args: dict
+
 
 class LlamaArguments(BaseModel):
     prompt: str
     suffix: Optional[str] = None
     max_tokens: int = 128
-    temperature: float = 0.8
+    temperature: float = 0.7
     top_p: float = 0.95
     logprobs: Optional[Union[int, None]] = None
     echo: bool = False
@@ -77,6 +85,34 @@ class LlamaArguments(BaseModel):
 def download_from_s3(bucket: str, key: str, local_path: str):
     s3 = boto3.client('s3')
     s3.download_file(bucket, key, local_path)
+
+def download_file(url, local_filename):
+    response = requests.get(url, stream=True)
+    response.raise_for_status()  # Ensure we got an OK response
+
+    with open(local_filename, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            f.write(chunk)
+
+def is_url(path):
+    try:
+        result = urlparse(path)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+
+
+
+@app.post("/")
+async def route(payload: RoutePayload):
+    if payload.configure:
+        llama_model_args = LlamaModelConfig(**payload.args)
+        return await configure(llama_model_args)
+    elif payload.inference:
+        llama_args = LlamaArguments(**payload.args)
+        return await invoke(llama_args)
+    else:
+        raise HTTPException(status_code=400, detail="Please specify either 'configure' or 'inference'")
 
 
 
@@ -104,7 +140,10 @@ async def configure(llama_model_args: LlamaModelConfig):
             local_path = MODELPATH
             download_from_s3(llama_model_args.bucket, llama_model_args.key, local_path)
             llama_model_args.model_path = local_path            
-
+        if llama_model_args.model_path:
+            if is_url(llama_model_args.model_path):
+                download_file(llama_model_args.model_path,MODELPATH)
+                llama_model_args.model_path=MODELPATH
         elif not llama_model_args.model_path:
             raise HTTPException(status_code=400, detail="Model path must be provided when S3 bucket and key are not specified")
         finalargs=llama_model_args.dict()
