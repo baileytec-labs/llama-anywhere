@@ -138,9 +138,9 @@ class LlamaAnywhereStack(Stack):
         userdataline=""
         if DEPLOYTYPE is not None:
             if 'Q' in DEPLOYTYPE.upper():
-                userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+portval+":"+portval+" -d my-container"
+                userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
             if 'F' in DEPLOYTYPE.upper():
-                userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+portval+":"+portval+" -d my-container",
+                userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container",
             # Define the user data to install Docker, git and other dependencies
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
