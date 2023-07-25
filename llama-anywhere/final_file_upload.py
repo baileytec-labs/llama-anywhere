@@ -209,7 +209,7 @@ def main():
     if 'F' in deploytype.upper():
         #we're not uploading with S3, so it makes things easier.
         config_payload['pretrained_model_name']=selectedmodel
-        invoke_payload['max_new_tokens']=TOKENSRESPONSE
+        invoke_payload['max_new_tokens']=TOKENRESPONSE
 
 
     # Ping
