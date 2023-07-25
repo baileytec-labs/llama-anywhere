@@ -49,8 +49,8 @@ def get_on_demand_price(instance_type, region_name):
 
 
 def determine_architecture(instance_type):
-    ec2 = boto3.client('ec2', region_name='us-east-1')
-    response = ec2.describe_instance_types(InstanceTypes=[instance_type])
+    ec2client = boto3.client('ec2', region_name='us-east-1')
+    response = ec2client.describe_instance_types(InstanceTypes=[instance_type])
     #should return a list of architectures. I only care about 'x86_64' or 'arm64'
     architectures = response['InstanceTypes'][0]['ProcessorInfo']['SupportedArchitectures']
 
@@ -89,7 +89,11 @@ class LlamaAnywhereStack(Stack):
         instance_type = self.node.try_get_context('instanceType')
 
         #We'll want to specify some form of port based on the deployment.
-        portval=int(self.node.try_get_context("portval"))
+        #I have to wrap this in a try-except when using cdk destroy.
+        try:
+            portval=int(self.node.try_get_context("portval"))
+        except:
+            portval=8080
         
         
         #HFMODEL = self.node.try_get_context('hfModel')
