@@ -49,15 +49,18 @@ def get_on_demand_price(instance_type, region_name):
 
 
 def determine_architecture(instance_type):
-    ec2client = boto3.client('ec2', region_name='us-east-1')
-    response = ec2client.describe_instance_types(InstanceTypes=[instance_type])
-    #should return a list of architectures. I only care about 'x86_64' or 'arm64'
-    architectures = response['InstanceTypes'][0]['ProcessorInfo']['SupportedArchitectures']
+    if instance_type is not None:
+        ec2client = boto3.client('ec2', region_name='us-east-1')
+        response = ec2client.describe_instance_types(InstanceTypes=[instance_type])
+        #should return a list of architectures. I only care about 'x86_64' or 'arm64'
+        architectures = response['InstanceTypes'][0]['ProcessorInfo']['SupportedArchitectures']
 
-    if 'arm64' in architectures:
-        return ec2.AmazonLinuxCpuType.ARM_64
-    elif 'x86_64' in architectures:
-        return ec2.AmazonLinuxCpuType.x86_64
+        if 'arm64' in architectures:
+            return ec2.AmazonLinuxCpuType.ARM_64
+        elif 'x86_64' in architectures:
+            return ec2.AmazonLinuxCpuType.x86_64
+    else:
+        return None
     #print(response['InstanceTypes'][0]['ProcessorInfo']['SupportedArchitectures'])
 
 
@@ -151,7 +154,7 @@ class LlamaAnywhereStack(Stack):
             "su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'", 
             userdataline,
         )
-
+        
         architecture = determine_architecture(instance_type)
         
 
