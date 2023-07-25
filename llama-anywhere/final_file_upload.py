@@ -156,9 +156,29 @@ def main():
         bucket_name = bucket_name['OutputValue']
     else:
         logger.info("BucketName not found in outputs")
+    if selectedmodel is not None:
+        selectedmodel = selectedmodel['OutputValue']
+    else:
+        logger.info("SelectedModel not found in outputs")
+    if deploytype is not None:
+        deploytype = deploytype['OutputValue']
+    else:
+        logger.info("deploytype not found in outputs")
+    if instanceprice is not None:
+        instanceprice = instanceprice['OutputValue']
+    else:
+        logger.info("instanceprice not found in outputs")
+    if instancetype is not None:
+        instancetype = instancetype['OutputValue']
+    else:
+        logger.info("instancetype not found in outputs")
     public_ip="http://"+get_public_ip(STACKNAME)+":"+port
     # Now bucket_name contains the outputted bucket name
     logger.info(bucket_name)
+    logger.info(selectedmodel)
+    logger.info(deploytype)
+    logger.info(instanceprice)
+    logger.info(instancetype)
 
     # Use bucket_name for your file upload operation
     s3_client = session.client('s3')
