@@ -138,8 +138,8 @@ async def invoke(model_args: ModelArguments):
         outputs=MODEL.generate(inputs,**model_args)
         finaloutdata={}
         for i, outdata in enumerate(outputs):
-            print(f"{i}: {tokenizer.decode(output)}")
-            finaloutdata{i}=tokenizer.decode(output)
+            print(f"{i}: {TOKENIZER.decode(output)}")
+            finaloutdata[i]=TOKENIZER.decode(output)
         output=finaloutdata
 
     except:
