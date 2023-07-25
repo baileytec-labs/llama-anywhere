@@ -12,6 +12,7 @@ import logging
 import time
 from urllib.parse import urlparse
 
+TIMEOUT_SECONDS = 900
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
@@ -250,7 +251,7 @@ def main():
 
     try:
         starttime=time.time()
-        config_response = requests.post(f"{public_ip}/configure", data=json.dumps(config_payload))
+        config_response = requests.post(f"{public_ip}/configure", data=json.dumps(config_payload),timeout=TIMEOUT_SECONDS)
         #logger.info(config_response.json())  # Print the response from the server
         endtime=time.time()
         roundtrip=endtime-starttime
@@ -282,7 +283,7 @@ def main():
 
     try:
         starttime=time.time()
-        invoke_response = requests.post(f"{public_ip}/invoke", data=json.dumps(invoke_payload))
+        invoke_response = requests.post(f"{public_ip}/invoke", data=json.dumps(invoke_payload),timeout=TIMEOUT_SECONDS)
         #logger.info(invoke_response.json())  # Print the response from the server
         endtime=time.time()
         roundtrip=endtime-starttime
