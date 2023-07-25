@@ -185,10 +185,14 @@ class LlamaAnywhereStack(Stack):
 
 
         #Down the line we will process if its huggingface / a url / local
-        cdk.CfnOutput(self, "ObjectName",value=MODEL)
+        if MODEL is not None:
+            cdk.CfnOutput(self, "ObjectName",value=MODEL)
+        
         cdk.CfnOutput(self, "BucketName", value=bucket.bucket_name)
         cdk.CfnOutput(self, "InstancePublicIP", value=instance.attr_public_ip)
-        cdk.CfnOutput(self,"DeployType",value=DEPLOYTYPE)
-        cdk.CfnOutput(self,"InstanceType",value=instance_type)
-        #gonna hardcode virginia here because the pricing sdk is limited, so I would prefer it working.
-        cdk.CfnOutput(self,"InstancePrice",value=str(get_on_demand_price(instance_type,'US East (N. Virginia)')))
+        if DEPLOYTYPE is not None:
+            cdk.CfnOutput(self,"DeployType",value=DEPLOYTYPE)
+        if instance_type is not None:
+            cdk.CfnOutput(self,"InstanceType",value=instance_type)
+            #gonna hardcode virginia here because the pricing sdk is limited, so I would prefer it working.
+            cdk.CfnOutput(self,"InstancePrice",value=str(get_on_demand_price(instance_type,'US East (N. Virginia)')))

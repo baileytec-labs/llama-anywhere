@@ -72,7 +72,7 @@ def get_public_ip(stack_name):
 
     # Look for the output value associated with the key 'InstancePublicIP'
     for output in stack['Stacks'][0]['Outputs']:
-        if output['OutputKey'] == 'QuantizedInstancePublicIP':
+        if output['OutputKey'] == 'InstancePublicIP':
             return output['OutputValue']
 
     # If the output key was not found, return None
