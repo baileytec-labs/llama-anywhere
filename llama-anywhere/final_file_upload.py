@@ -10,6 +10,8 @@ import argparse
 import traceback
 import logging
 import time
+from urllib.parse import urlparse
+
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
