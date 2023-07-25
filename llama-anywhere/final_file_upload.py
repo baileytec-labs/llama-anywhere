@@ -218,7 +218,7 @@ def main():
     except:
         logdict={
             "Action":"Ping response",
-            "error_message":str(traceback.format_exc())
+            "error_message":str(traceback.format_exc()),
             "instance_type":instancetype,
         }
         logger.info(json.dumps(logdict))
@@ -252,7 +252,7 @@ def main():
     except:
         logdict={
             "Action":"Configuration",
-            "error_message":str(traceback.format_exc())
+            "error_message":str(traceback.format_exc()),
             "instance_type":instancetype,
         }
         logdict.update(config_payload)
@@ -284,7 +284,7 @@ def main():
     except:
         logdict={
             "Action":"Configuration",
-            "error_message":str(traceback.format_exc())
+            "error_message":str(traceback.format_exc()),
             "instance_type":instancetype,
         }
         logdict.update(invoke_payload)

@@ -38,6 +38,6 @@ trap cleanup EXIT
 source .venv/bin/activate 
 
 # use variables in context 
-cdk deploy --require-approval never -c deployType=$deploytype -c port=$port -c instanceType=$instancetype -c model=$model
+cdk deploy --require-approval never -c deployType=$deploytype -c portval=$port -c instanceType=$instancetype -c model=$model
 
 python3 final_file_upload.py
