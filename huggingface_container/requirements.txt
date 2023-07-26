@@ -8,3 +8,4 @@ transformers
 accelerator
 einops
 xformers
+requests
