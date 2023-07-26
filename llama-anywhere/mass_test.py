@@ -24,11 +24,15 @@ def run_shell_script(deploytype, port, model, instance_type):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("foundationmodel",type=str,default="VMware/open-llama-7b-v2-open-instruct", help="Huggingface transformer compatible repository path (VMware/open-llama-7b-v2-open-instruct)")
-    parser.add_argument("quantizedmodel", type=str,default="https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin",help="URL or path to the quantized model (https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin)")
+    parser.add_argument("foundationmodel",required=False, type=str,default="VMware/open-llama-7b-v2-open-instruct", help="Huggingface transformer compatible repository path (VMware/open-llama-7b-v2-open-instruct)")
+    parser.add_argument("quantizedmodel", required=False, type=str,default="https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin",help="URL or path to the quantized model (https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin)")
+    parser.add_argument("instancetype",type=str,default="multi",required=False, help="If you'd like to just have a single instance type to test the two models against, specify it here. Otherwise it will cycle through all instances." )
     args = parser.parse_args()
     port = 8080
-    instance_types = list_instance_types('us-east-1') 
+    if args.instancetype == "multi":
+        instance_types = list_instance_types('us-east-1') 
+    else:
+        instance_types=[args.instancetype]
 
     for instance_type in instance_types:
         # Run shell script for foundation model

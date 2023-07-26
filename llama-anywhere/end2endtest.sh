@@ -8,19 +8,15 @@ model="https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.g
 while getopts ":deploytype:port:instancetype:model:" opt; do
   case $opt in
     deploytype)
-      echo "-deploytype was triggered, Parameter: $OPTARG" >&2
       deploytype=$OPTARG
       ;;
     port)
-      echo "-port was triggered, Parameter: $OPTARG" >&2
       port=$OPTARG
       ;;
     instancetype)
-      echo "-instancetype was triggered, Parameter: $OPTARG" >&2
       instancetype=$OPTARG
       ;;
     model)
-      echo "-model was triggered, Parameter: $OPTARG" >&2
       model=$OPTARG
       ;;
     \?)
