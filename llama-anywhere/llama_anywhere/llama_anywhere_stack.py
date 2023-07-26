@@ -8,7 +8,6 @@ from aws_cdk import (
 import aws_cdk as cdk
 import boto3
 import uuid
-import time
 import requests
 import json
 
@@ -18,7 +17,6 @@ my_public_ip = requests.get('https://api.ipify.org').text
 #portval=8080
 
 
-#LOCALMODEL="/Users/seanbailey/Github/llama-anywhere/llama2-testmodel.bin"
 #based on the instance type that is selected, we can also have the on-demand price written to cloudformation variables, and process it downstream.
 def get_on_demand_price(instance_type, region_name):
     pricing = boto3.client('pricing', region_name='us-east-1')
@@ -46,6 +44,25 @@ def get_on_demand_price(instance_type, region_name):
                         return float(price_dimension['pricePerUnit']['USD'])
                     
     return None
+
+def get_latest_deep_learning_ami(region_name='us-west-2'):
+    ec2_client = boto3.client('ec2', region_name=region_name)
+    
+    response = ec2_client.describe_images(
+        Owners=['amazon'],
+        Filters=[
+            {'Name': 'name', 'Values': ['Deep Learning AMI GPU PyTorch * (Amazon Linux 2) *']},
+            #{'Name': 'state', 'Values': ['available']},
+            #{'Name': 'description', 'Values': ['Deep Learning AMI with NVIDIA CUDA 11 Driver, Intel MKL-DNN, Docker, NVIDIA Docker, AWS Neuron, NVIDIA Deep Learning Containers (optimized for PyTorch)*']}
+        ]
+    )
+    
+    # Sort images by creation date
+    images = sorted(response['Images'], key=lambda k: k['CreationDate'], reverse=True)
+    #print(images)
+
+    # Return the latest image id
+    return images[0]['ImageId'] if images else None
 
 
 def determine_architecture(instance_type):
@@ -138,9 +155,9 @@ class LlamaAnywhereStack(Stack):
         userdataline=""
         if DEPLOYTYPE is not None:
             if 'Q' in DEPLOYTYPE.upper():
-                userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
+                userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build --gpus all -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
             if 'F' in DEPLOYTYPE.upper():
-                userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container",
+                userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --gpus all --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container",
             # Define the user data to install Docker, git and other dependencies
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
@@ -154,8 +171,16 @@ class LlamaAnywhereStack(Stack):
             "su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'", 
             userdataline,
         )
-        
+        IMAGEID=None
+
+        #This will give us the ability to automatically get an EC2 instance with the appropriate drivers and gpu availability installed. 
         architecture = determine_architecture(instance_type)
+        if instance_type is not None:
+            if instance_type.upper().startswith("G3") or instance_type.upper().startswith("P3") or instance_type.upper().startswith("P3DN") or instance_type.upper().startswith("P4D") or instance_type.upper().startswith("P4DE") or instance_type.upper().startswith("G5") or instance_type.upper().startswith("G4DN"):
+                IMAGEID=get_latest_deep_learning_ami(instance_type)
+            else:
+                IMAGEID=ec2.MachineImage.latest_amazon_linux2(cpu_type=architecture).get_image(self).image_id
+
         
 
         # Define a new EC2 instance for testing the  model
@@ -164,7 +189,7 @@ class LlamaAnywhereStack(Stack):
             instance_type=instance_type,
             #here is a bit of a pickle. I need to have this determine automatically if this is going to be an x86 or arm processor and select an image id.
             #We could also have the user specify it as well...
-            image_id=ec2.MachineImage.latest_amazon_linux2(cpu_type=architecture).get_image(self).image_id,
+            image_id=IMAGEID,
             subnet_id=vpc.public_subnets[0].subnet_id,
             iam_instance_profile=instance_profile.ref,
             security_group_ids=[sg.security_group_id],
