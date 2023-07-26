@@ -169,7 +169,7 @@ class LlamaAnywhereStack(Stack):
             iam_instance_profile=instance_profile.ref,
             security_group_ids=[sg.security_group_id],
             user_data=cdk.Fn.base64(user_data.render()),
-            #key_name=key_name,  # replace this with the name of your key pair
+            #key_name="",  # replace this with the name of your key pair
             block_device_mappings=[  # attach a 200 GB EBS volume
                 {
                     "deviceName": "/dev/sda1",  # this can be different depending on your AMI

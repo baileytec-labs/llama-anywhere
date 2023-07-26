@@ -177,6 +177,7 @@ def main():
         logger.info("instancetype not found in outputs")
     public_ip="http://"+get_public_ip(STACKNAME)+":"+port
     # Now bucket_name contains the outputted bucket name
+    logger.info(public_ip)
     logger.info(bucket_name)
     logger.info(selectedmodel)
     logger.info(deploytype)
@@ -219,32 +220,55 @@ def main():
     #we want to record the instance type
     #We want to record the on demand cost
     #We want to calculate and record the total cost. Billed at 60 second minimum durations.
-    try:
-        starttime=time.time()
-        ping_response = requests.get(f"{public_ip}/ping")
-        endtime=time.time()
-        roundtrip=endtime-starttime
-        if roundtrip/60 < 1:
-            totalcost=1
-        else:
-            totalcost=roundtrip/60
-        totalcost=totalcost * instanceprice
-        logger.info(ping_response.status_code)  # Print the response status code
-        logdict={
-            "Action":"Ping response",
-            "roundtrip_time":roundtrip,
-            "instance_type":instancetype,
-            "on_demand_cost":instanceprice,
-            "total_cost":totalcost
-        }
-        logger.info(json.dumps(logdict))
-    except:
-        logdict={
-            "Action":"Ping response",
-            "error_message":str(traceback.format_exc()),
-            "instance_type":instancetype,
-        }
-        logger.info(json.dumps(logdict))
+
+    #We know that the EC2 instance doesn't finish the installation despite cloudformation finishing standing up the instance. 
+    trycounter=20
+    while True:
+        try:
+            starttime=time.time()
+            ping_response = requests.get(f"{public_ip}/ping")
+            endtime=time.time()
+            roundtrip=endtime-starttime
+            if roundtrip/60 < 1:
+                totalcost=1
+            else:
+                totalcost=roundtrip/60
+            totalcost=totalcost * instanceprice
+            logger.info(ping_response.status_code)  # Print the response status code
+            logdict={
+                "Action":"Ping response",
+                "roundtrip_time":roundtrip,
+                "instance_type":instancetype,
+                "on_demand_cost":instanceprice,
+                "total_cost":totalcost
+            }
+            logger.info(json.dumps(logdict))
+            break
+        except:
+            errordata=str(traceback.format_exc())
+            if not "Failed to establish a new connection: [Errno 61] Connection refused" in errordata:
+                logdict={
+                    "Action":"Ping response",
+                    "error_message":str(errordata),
+                    "instance_type":instancetype,
+                }
+                logger.info(json.dumps(logdict))
+                break
+            else:
+                #give the server some time to stand up...
+                if trycounter > 0:
+                    time.sleep(30)
+                    trycounter = trycounter-1
+                else:
+                    logdict={
+                    "Action":"Ping response",
+                    "error_message":str(errordata),
+                    "instance_type":instancetype,
+                    }
+                    logger.info(json.dumps(logdict))
+                    break
+
+
 
     #We're going to need some form of standardized configuration payload settings...
 
