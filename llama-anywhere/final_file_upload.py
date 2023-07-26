@@ -233,7 +233,7 @@ def main():
                 totalcost=1
             else:
                 totalcost=roundtrip/60
-            totalcost=totalcost * instanceprice
+            totalcost=(float(totalcost) * float(instanceprice)) / 60
             logger.info(ping_response.status_code)  # Print the response status code
             logdict={
                 "Action":"Ping response",
@@ -283,7 +283,7 @@ def main():
             totalcost=1
         else:
             totalcost=roundtrip/60
-        totalcost=totalcost * instanceprice
+        totalcost=(float(totalcost) * float(instanceprice)) / 60
         logger.info(ping_response.status_code)  # Print the response status code
         logdict={
             "Action":"Configuration",
@@ -315,7 +315,7 @@ def main():
             totalcost=1
         else:
             totalcost=roundtrip/60
-        totalcost=totalcost * instanceprice
+        totalcost=(float(totalcost) * float(instanceprice)) / 60
         logger.info(ping_response.status_code)  # Print the response status code
         logdict={
             "Action":"Invocation",
