@@ -36,6 +36,9 @@ RUN apt-get update && \
 
 
 # Copy requirements.txt and install Python dependencies
+#so there is a challenge in the requirements.txt. torch needs to be installed before requirements.txt is run due to xformers. no big deal.
+
+RUN pip3 install torch
 COPY requirements.txt ./requirements.txt
 COPY main.py .
 COPY prepare_huggingface_data.py .

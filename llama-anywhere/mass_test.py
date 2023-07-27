@@ -356,10 +356,10 @@ def list_instance_types(numinstances=10, instanceset=None):
 
 def run_shell_script(deploytype, port, model, instance_type):
     command = ["bash", "end2endtest.sh", 
-               "-deploytype", deploytype, 
-               "-port", str(port), 
-               "-model", model, 
-               "-instancetype", instance_type]
+               "-d", deploytype, 
+               "-p", str(port), 
+               "-m", model, 
+               "-i", instance_type]
     subprocess.check_call(command)
 
 def main():

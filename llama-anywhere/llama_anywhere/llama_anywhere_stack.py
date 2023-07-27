@@ -17,6 +17,9 @@ my_public_ip = requests.get('https://api.ipify.org').text
 #portval=8080
 
 
+gpu_instances=['g4ad', 'g4dn', 'g5', 'inf1', 'p2', 'p3', 'p3dn', 'p4d', 'p4de', 'p4ov', 'v100']
+
+
 #based on the instance type that is selected, we can also have the on-demand price written to cloudformation variables, and process it downstream.
 def get_on_demand_price(instance_type, region_name):
     pricing = boto3.client('pricing', region_name='us-east-1')
@@ -45,7 +48,7 @@ def get_on_demand_price(instance_type, region_name):
                     
     return None
 
-def get_latest_deep_learning_ami(region_name='us-west-2'):
+def get_latest_deep_learning_ami(region_name='us-east-1'):
     ec2_client = boto3.client('ec2', region_name=region_name)
     
     response = ec2_client.describe_images(
@@ -75,7 +78,7 @@ def determine_architecture(instance_type):
         if 'arm64' in architectures:
             return ec2.AmazonLinuxCpuType.ARM_64
         elif 'x86_64' in architectures:
-            return ec2.AmazonLinuxCpuType.x86_64
+            return ec2.AmazonLinuxCpuType.X86_64
     else:
         return None
     #print(response['InstanceTypes'][0]['ProcessorInfo']['SupportedArchitectures'])
@@ -107,6 +110,9 @@ class LlamaAnywhereStack(Stack):
         
         #We'll need to specify some form of instance type based on the deployment.
         instance_type = self.node.try_get_context('instanceType')
+        regionval=self.node.try_get_context('region')
+        if regionval is None:
+            regionval="us-east-1"
 
         #We'll want to specify some form of port based on the deployment.
         #I have to wrap this in a try-except when using cdk destroy.
@@ -158,25 +164,34 @@ class LlamaAnywhereStack(Stack):
         #This will give us the ability to automatically get an EC2 instance with the appropriate drivers and gpu availability installed. 
         architecture = determine_architecture(instance_type)
         if instance_type is not None:
-            if instance_type.upper().startswith("G3") or instance_type.upper().startswith("P3") or instance_type.upper().startswith("P3DN") or instance_type.upper().startswith("P4D") or instance_type.upper().startswith("P4DE") or instance_type.upper().startswith("G5") or instance_type.upper().startswith("G4DN"):
-                IMAGEID=get_latest_deep_learning_ami(instance_type)
+            instanceclass=instance_type.split('.')[0]
+            if instanceclass in gpu_instances:
+                IMAGEID=get_latest_deep_learning_ami(regionval)
                 GPUINSTANCE=True
             else:
                 IMAGEID=ec2.MachineImage.latest_amazon_linux2(cpu_type=architecture).get_image(self).image_id
         userdataline=""
+        downloadline=""
         if DEPLOYTYPE is not None:
             if 'Q' in DEPLOYTYPE.upper():
                 if GPUINSTANCE:
-                    userdataline="cd llama-anywhere && cd quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container"
+                    downloadline = """sudo su - ec2-user -c "bash -c 'cd /home/ec2-user; git clone https://github.com/baileytec-labs/llama-anywhere.git'" > /home/ec2-user/userdata.log 2>&1"""
+                    userdataline="""sudo su - ec2-user -c 'cd /home/ec2-user/llama-anywhere/quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run --gpus all -p {portval}:{portval} -d my-container'"""
+
                 else:
+                    downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
                     userdataline="cd llama-anywhere && cd quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
             if 'F' in DEPLOYTYPE.upper():
                 if GPUINSTANCE:
-                    userdataline="cd llama-anywhere && cd foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container"
+                    downloadline = """sudo su - ec2-user -c "bash -c 'cd /home/ec2-user; git clone https://github.com/baileytec-labs/llama-anywhere.git'" > /home/ec2-user/userdata.log 2>&1"""
+                    userdataline="sudo su - ec2-user -c 'cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container'"
                 else:
+                    downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
                     userdataline="cd llama-anywhere && cd foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
 
             # Define the user data to install Docker, git and other dependencies
+        print(downloadline),
+        print(userdataline)
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
             "yum update -y",
@@ -186,7 +201,7 @@ class LlamaAnywhereStack(Stack):
             "service docker start",
             "chkconfig docker on",
             "cd /home/ec2-user",
-            "su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'", 
+            downloadline, 
             userdataline,
         )
         
@@ -209,7 +224,7 @@ class LlamaAnywhereStack(Stack):
                     "ebs": {
                         "volumeSize": 200,  # specify the volume size in GB
                         "deleteOnTermination": True,  # delete the volume when the instance is terminated
-                        "volumeType": "gp3"  # specify the volume type. gp2 is general purpose SSD volume type
+                        "volumeType": "gp3"  # specify the volume type. gp3 is general purpose SSD volume type
                     }
                 }
             ]

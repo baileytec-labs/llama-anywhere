@@ -5,18 +5,18 @@ port="8080"
 instancetype="t4g.xlarge"
 model="https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q2_K.bin"
 
-while getopts ":deploytype:port:instancetype:model:" opt; do
+while getopts ":d:p:i:m:" opt; do
   case $opt in
-    deploytype)
+    d)
       deploytype=$OPTARG
       ;;
-    port)
+    p)
       port=$OPTARG
       ;;
-    instancetype)
+    i)
       instancetype=$OPTARG
       ;;
-    model)
+    m)
       model=$OPTARG
       ;;
     \?)
