@@ -17,8 +17,10 @@ OPENAPI_PREFIX = f"/{STAGE}" if STAGE else "/"
 app = FastAPI(title="Sagemaker Endpoint LLM API for HuggingFace Models", openapi_prefix=OPENAPI_PREFIX)
 
 TOKENIZER = AutoTokenizer.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH)
-MODEL = AutoModelForCausalLM.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH)
+MODEL = AutoModel.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH)
 
+print(MODEL_TYPE)
+print(SAVEPATH)
 
 class ModelConfig(BaseModel):
     pretrained_model_name: Union[str, Path]

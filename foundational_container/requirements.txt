@@ -1,4 +1,5 @@
 fastapi
+protobuf
 sentencepiece
 boto3
 starlette
