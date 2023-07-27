@@ -6,6 +6,7 @@ from starlette.responses import Response
 from pydantic import BaseModel, validator
 from typing import Optional, List, Union
 import traceback
+from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
 #in here we need to instead use huggingface transformers, using a model of the users selection.
 

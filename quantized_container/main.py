@@ -6,6 +6,7 @@ from starlette.responses import Response
 from llama_cpp import Llama
 from pydantic import BaseModel, validator
 from typing import Optional, List, Union
+from pathlib import Path
 import traceback
 import requests
 from urllib.parse import urlparse
