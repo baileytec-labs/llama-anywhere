@@ -152,12 +152,30 @@ class LlamaAnywhereStack(Stack):
             connection=ec2.Port.tcp(portval),
             description="Allow HTTP access from current public IP"
         )
+        
+        IMAGEID=None
+        GPUINSTANCE=False
+        #This will give us the ability to automatically get an EC2 instance with the appropriate drivers and gpu availability installed. 
+        architecture = determine_architecture(instance_type)
+        if instance_type is not None:
+            if instance_type.upper().startswith("G3") or instance_type.upper().startswith("P3") or instance_type.upper().startswith("P3DN") or instance_type.upper().startswith("P4D") or instance_type.upper().startswith("P4DE") or instance_type.upper().startswith("G5") or instance_type.upper().startswith("G4DN"):
+                IMAGEID=get_latest_deep_learning_ami(instance_type)
+                GPUINSTANCE=True
+            else:
+                IMAGEID=ec2.MachineImage.latest_amazon_linux2(cpu_type=architecture).get_image(self).image_id
         userdataline=""
         if DEPLOYTYPE is not None:
             if 'Q' in DEPLOYTYPE.upper():
-                userdataline="cd llama-anywhere && cd sagemaker_container && DOCKER_BUILDKIT=1 docker build --gpus all -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
+                if GPUINSTANCE:
+                    userdataline="cd llama-anywhere && cd quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container"
+                else:
+                    userdataline="cd llama-anywhere && cd quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
             if 'F' in DEPLOYTYPE.upper():
-                userdataline="cd llama-anywhere && cd huggingface_container && DOCKER_BUILDKIT=1 docker build --gpus all --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container",
+                if GPUINSTANCE:
+                    userdataline="cd llama-anywhere && cd foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container"
+                else:
+                    userdataline="cd llama-anywhere && cd foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL="+MODEL+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
+
             # Define the user data to install Docker, git and other dependencies
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
@@ -171,16 +189,6 @@ class LlamaAnywhereStack(Stack):
             "su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'", 
             userdataline,
         )
-        IMAGEID=None
-
-        #This will give us the ability to automatically get an EC2 instance with the appropriate drivers and gpu availability installed. 
-        architecture = determine_architecture(instance_type)
-        if instance_type is not None:
-            if instance_type.upper().startswith("G3") or instance_type.upper().startswith("P3") or instance_type.upper().startswith("P3DN") or instance_type.upper().startswith("P4D") or instance_type.upper().startswith("P4DE") or instance_type.upper().startswith("G5") or instance_type.upper().startswith("G4DN"):
-                IMAGEID=get_latest_deep_learning_ami(instance_type)
-            else:
-                IMAGEID=ec2.MachineImage.latest_amazon_linux2(cpu_type=architecture).get_image(self).image_id
-
         
 
         # Define a new EC2 instance for testing the  model
@@ -194,10 +202,10 @@ class LlamaAnywhereStack(Stack):
             iam_instance_profile=instance_profile.ref,
             security_group_ids=[sg.security_group_id],
             user_data=cdk.Fn.base64(user_data.render()),
-            #key_name="",  # replace this with the name of your key pair
+            key_name="shabadedoo",  # replace this with the name of your key pair
             block_device_mappings=[  # attach a 200 GB EBS volume
                 {
-                    "deviceName": "/dev/sda1",  # this can be different depending on your AMI
+                    "deviceName": "/dev/xvda",  # this can be different depending on your AMI
                     "ebs": {
                         "volumeSize": 200,  # specify the volume size in GB
                         "deleteOnTermination": True,  # delete the volume when the instance is terminated

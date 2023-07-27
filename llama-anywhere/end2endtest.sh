@@ -24,6 +24,10 @@ while getopts ":deploytype:port:instancetype:model:" opt; do
       ;;
   esac
 done
+echo $model
+echo $port
+echo $instancetype
+echo $deploytype
 
 function cleanup {
     cdk destroy --force
