@@ -370,7 +370,7 @@ def main():
     parser.add_argument("--instancetype",type=str,default=None,required=False, help="Specify the instance you'd like to test against" )
     parser.add_argument("--instanceclass",type=str,default=None,required=False, help="Specify the instance class to select from. Selects random at default. Choose from 'gpu_instances','m_instances','t_instances','r_instances','c_instances','all', " )
     parser.add_argument("--instancecount",type=int,default=10,required=False, help="Specify the number of instances you want to pull from the instance class. Default 10" )
-    parser.add_argument("--hftoken",type="str",default="",required=False,help="Token for huggingface in order to download private models.")
+    parser.add_argument("--hftoken",type=str,default="",required=False,help="Token for huggingface in order to download private models.")
 
     args = parser.parse_args()
     port = 8080
