@@ -15,7 +15,7 @@ try:
 
     #pipe=pipeline(task="text-generation",model=MODEL, trust_remote_code=True)
     tokenizer = AutoTokenizer.from_pretrained(MODEL,cache_dir=SAVEPATH)
-    model = AutoModelForCausalLM.from_pretrained(MODEL,cache_dir=SAVEPATH)
+    model = AutoModel.from_pretrained(MODEL,cache_dir=SAVEPATH)
     #I'm hoping that this will download to the appropriate local directory and it will check there first. Who knows?
 except:
     print(traceback.format_exc())

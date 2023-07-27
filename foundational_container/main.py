@@ -114,10 +114,10 @@ def download_from_s3(bucket: str, key: str, local_path: str):
 @app.post("/")
 async def route(payload: RoutePayload):
     if payload.configure:
-        llama_model_args = LlamaModelConfig(**payload.args)
+        llama_model_args = ModelConfig(**payload.args)
         return await configure(llama_model_args)
     elif payload.inference:
-        model_args = LlamaArguments(**payload.args)
+        model_args = ModelArguments(**payload.args)
         return await invoke(model_args)
     else:
         raise HTTPException(status_code=400, detail="Please specify either 'configure' or 'inference'")
@@ -152,7 +152,7 @@ async def configure(model_config_args: ModelConfig):
         global TOKENIZER
         global MODEL
         TOKENIZER = AutoTokenizer.from_pretrained(**model_config_args.dict())
-        MODEL = AutoTokenizer.from_pretrained(**model_config_args.dict())
+        MODEL = AutoModel.from_pretrained(**model_config_args.dict())
         
         return {"status": "success"}
     except:
