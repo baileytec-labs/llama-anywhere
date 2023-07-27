@@ -10,8 +10,12 @@ from typing import Union, Optional, Dict, Any
 from pathlib import Path
 from pydantic import BaseModel
 import traceback
+from typing import ClassVar
+from pydantic import BaseModel
 from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
+from typing import Optional, List, ClassVar
+from pydantic import BaseModel, validator
 #in here we need to instead use huggingface transformers, using a model of the users selection.
 
 MODEL_TYPE=os.environ.get("MODEL_TYPE")
@@ -46,62 +50,61 @@ class ModelConfig(BaseModel):
 class ModelArguments(BaseModel):
     input_text: str
     # Length control parameters
-    max_length = 20
-    max_new_tokens = None
-    min_length = 0
-    min_new_tokens = None
-    early_stopping = False
-    max_time = None
+    max_length: ClassVar[int] = 20
+    max_new_tokens: Optional[int] = None
+    min_length: int = 0
+    min_new_tokens: Optional[int] = None
+    early_stopping: bool = False
+    max_time: Optional[float] = None
 
     # Generation strategy parameters
-    do_sample = False
-    num_beams = 1
-    num_beam_groups = 1
-    penalty_alpha = None
-    use_cache = True
+    do_sample: bool = False
+    num_beams: int = 1
+    num_beam_groups: int = 1
+    penalty_alpha: Optional[float] = None
+    use_cache: bool = True
 
     # Logit manipulation parameters
-    temperature = 0.7
-    top_k = 40
-    top_p = 0.95
-    typical_p = 1.0
-    epsilon_cutoff = 0.0
-    eta_cutoff = 0.0
-    diversity_penalty = 0.0
-    repetition_penalty = 1.1
-    encoder_repetition_penalty = 1.1
-    length_penalty = 1.0
-    no_repeat_ngram_size = 0
-    bad_words_ids = None
-    force_words_ids = None
-    renormalize_logits = False
-    constraints = None
-    forced_bos_token_id = None
-    forced_eos_token_id = None
-    remove_invalid_values = None
-    exponential_decay_length_penalty = None
-    suppress_tokens = None
-    begin_suppress_tokens = None
-    forced_decoder_ids = None
-    sequence_bias = None
-    guidance_scale = None
+    temperature: float = 0.7
+    top_k: int = 40
+    top_p: float = 0.95
+    typical_p: float = 1.0
+    epsilon_cutoff: float = 0.0
+    eta_cutoff: float = 0.0
+    diversity_penalty: float = 0.0
+    repetition_penalty: float = 1.1
+    encoder_repetition_penalty: float = 1.1
+    length_penalty: float = 1.0
+    no_repeat_ngram_size: int = 0
+    bad_words_ids: Optional[List[int]] = None
+    force_words_ids: Optional[List[int]] = None
+    renormalize_logits: bool = False
+    constraints: Optional[str] = None
+    forced_bos_token_id: Optional[int] = None
+    forced_eos_token_id: Optional[int] = None
+    remove_invalid_values: Optional[bool] = None
+    exponential_decay_length_penalty: Optional[bool] = None
+    suppress_tokens: Optional[List[int]] = None
+    begin_suppress_tokens: Optional[List[int]] = None
+    forced_decoder_ids: Optional[List[int]] = None
+    sequence_bias: Optional[float] = None
+    guidance_scale: Optional[float] = None
 
     # Output variables parameters
-    num_return_sequences = 1
-    output_attentions = False
-    output_hidden_states = False
-    output_scores = False
-    return_dict_in_generate = False
+    num_return_sequences: int = 1
+    output_attentions: bool = False
+    output_hidden_states: bool = False
+    output_scores: bool = False
+    return_dict_in_generate: bool = False
 
     # Special tokens parameters
-    pad_token_id = None
-    bos_token_id = None
-    eos_token_id = None
+    pad_token_id: Optional[int] = None
+    bos_token_id: Optional[int] = None
+    eos_token_id: Optional[int] = None
 
     # Encoder-decoder exclusive parameters
-    encoder_no_repeat_ngram_size = 0
-    decoder_start_token_id = None
-
+    encoder_no_repeat_ngram_size: int = 0
+    decoder_start_token_id: Optional[int] = None
 
     @validator('tensor_split')
     def validate_tensor_split(cls, v):
