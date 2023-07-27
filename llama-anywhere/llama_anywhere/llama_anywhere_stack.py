@@ -104,6 +104,7 @@ class LlamaAnywhereStack(Stack):
         #We will need some form of model info which will be universally consumed and processed based on the endpoint type...
 
         MODEL = self.node.try_get_context("model")
+        HF_TOKEN=self.node.try_get_context("hftoken")
 
         #LOCALMODEL = self.node.try_get_context('localModel')
         #key_name = self.node.try_get_context('keyName')
@@ -183,11 +184,19 @@ class LlamaAnywhereStack(Stack):
                     userdataline="cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
             if 'F' in DEPLOYTYPE.upper():
                 if GPUINSTANCE:
-                    downloadline = """sudo su - ec2-user -c "bash -c 'cd /home/ec2-user; git clone https://github.com/baileytec-labs/llama-anywhere.git'" > /home/ec2-user/userdata.log 2>&1"""
-                    userdataline="sudo su - ec2-user -c 'cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL='"+MODEL+"' -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container'"
+                    if HF_TOKEN is not None:
+                        downloadline = """sudo su - ec2-user -c "bash -c 'cd /home/ec2-user; git clone https://github.com/baileytec-labs/llama-anywhere.git'" > /home/ec2-user/userdata.log 2>&1"""
+                        userdataline="sudo su - ec2-user -c 'cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL='"+MODEL+"' --build-arg HF_TOKEN="+HF_TOKEN+" -t my-container . && docker run --gpus all -p "+str(portval)+":"+str(portval)+" -d my-container'"
+                    else:
+                        downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
+                        userdataline="cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL='"+MODEL+"' -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
                 else:
-                    downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
-                    userdataline="cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL='"+MODEL+"' -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
+                    if HF_TOKEN is not None:
+                        downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
+                        userdataline="cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL='"+MODEL+"' --build-arg HF_TOKEN="+HF_TOKEN+" -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
+                    else:
+                        downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
+                        userdataline="cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build --build-arg MODEL='"+MODEL+"' -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
 
             # Define the user data to install Docker, git and other dependencies
         print(downloadline),

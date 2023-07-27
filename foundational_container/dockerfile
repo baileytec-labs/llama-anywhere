@@ -3,6 +3,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 
 ARG MODEL
+ARG HF_TOKEN
 # Use an official Python runtime based on Debian 10 "buster" as a parent image
 # FROM python:3.10-slim-buster
 
@@ -12,6 +13,7 @@ RUN mkdir -p /models
 ENV PYTHONUNBUFFERED=1
 # Set MODELPATH environment variable
 ENV MODEL_TYPE=$MODEL
+ENV HF_AUTH_TOKEN=$HF_TOKEN
 ENV SAVE_PATH="/models"
 
 # The working directory in the Docker image

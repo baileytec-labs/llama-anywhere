@@ -23,6 +23,7 @@ SAVEPATH=os.environ.get("SAVE_PATH")
 STAGE = os.environ.get('STAGE', None)
 OPENAPI_PREFIX = f"/{STAGE}" if STAGE else "/"
 
+
 app = FastAPI(title="Sagemaker Endpoint LLM API for HuggingFace Models", openapi_prefix=OPENAPI_PREFIX)
 
 TOKENIZER = AutoTokenizer.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH)
