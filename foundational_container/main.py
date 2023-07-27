@@ -106,12 +106,6 @@ class ModelArguments(BaseModel):
     encoder_no_repeat_ngram_size: int = 0
     decoder_start_token_id: Optional[int] = None
 
-    @validator('tensor_split')
-    def validate_tensor_split(cls, v):
-        if v is not None and not all(isinstance(item, float) for item in v):
-            raise ValueError('All elements in the tensor_split list must be floats')
-        return v
-
 class RoutePayload(BaseModel):
     configure: bool
     inference: bool
