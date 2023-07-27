@@ -181,7 +181,7 @@ class LlamaAnywhereStack(Stack):
 
                 else:
                     downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
-                    userdataline="cd /home/ec2-user/llama-anywhere/foundational_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
+                    userdataline="cd /home/ec2-user/llama-anywhere/quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run -p "+str(portval)+":"+str(portval)+" -d my-container"
             if 'F' in DEPLOYTYPE.upper():
                 if GPUINSTANCE:
                     if HF_TOKEN is not None:
