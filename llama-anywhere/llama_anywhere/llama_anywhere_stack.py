@@ -126,7 +126,7 @@ class LlamaAnywhereStack(Stack):
         #SAVEPATH = self.node.try_get_context('savePath')
 
         #can't make them hyper unique... as it causes a problem with destroy.
-        bucket_name="llama-anywhere-bucket"#+str(uuid.uuid4()).replace("-","").replace("_","")
+        bucket_name="llama-anywhere-bucket"+str(uuid.uuid4()).replace("-","").replace("_","")
         # Define a new S3 Bucket
         bucket = s3.Bucket(self, "MyBucket",bucket_name=bucket_name)
 
