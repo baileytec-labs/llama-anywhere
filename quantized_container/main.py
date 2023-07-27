@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from starlette.responses import Response
 from llama_cpp import Llama
 from pydantic import BaseModel, validator
+from typing import Dict, Optional
 from typing import Optional, List, Union
 from pathlib import Path
 import traceback
