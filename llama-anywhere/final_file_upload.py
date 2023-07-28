@@ -209,7 +209,7 @@ def main():
         invoke_payload['max_tokens']=TOKENRESPONSE
     if 'F' in deploytype.upper():
         #we're not uploading with S3, so it makes things easier.
-        config_payload['pretrained_model_name']=selectedmodel
+        config_payload['pretrained_model_name_or_path']=selectedmodel
         invoke_payload['max_new_tokens']=TOKENRESPONSE
 
 

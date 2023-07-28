@@ -33,15 +33,15 @@ if HF_AUTH_TOKEN is not None:
         HF_AUTH_TOKEN = os.environ.get(HF_AUTH_TOKEN)
 #Initial config 
 
-TOKENIZER = AutoTokenizer.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
-MODEL = AutoModel.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
+TOKENIZER = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
+MODEL = AutoModel.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
 
 
 print(MODEL_TYPE)
 print(SAVEPATH)
 
 class ModelConfig(BaseModel):
-    pretrained_model_name: Union[str, Path]
+    pretrained_model_name_or_path: Union[str, Path]
     use_auth_token:Optional[str]=os.environ.get('HF_AUTH_TOKEN')
     config_file_name: Optional[Union[str, Path]] = "generation_config.json"
     cache_dir: Optional[Union[str, Path]] = SAVEPATH
