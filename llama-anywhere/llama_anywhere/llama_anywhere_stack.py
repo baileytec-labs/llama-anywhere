@@ -177,7 +177,7 @@ class LlamaAnywhereStack(Stack):
             if 'Q' in DEPLOYTYPE.upper():
                 if GPUINSTANCE:
                     downloadline = """sudo su - ec2-user -c "bash -c 'cd /home/ec2-user; git clone https://github.com/baileytec-labs/llama-anywhere.git'" > /home/ec2-user/userdata.log 2>&1"""
-                    userdataline="""sudo su - ec2-user -c 'cd /home/ec2-user/llama-anywhere/quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run --gpus all -p {portval}:{portval} -d my-container'"""
+                    userdataline="""sudo su - ec2-user -c 'cd /home/ec2-user/llama-anywhere/quantized_container && DOCKER_BUILDKIT=1 docker build -t my-container . && docker run --gpus all -p """+str(portval)+""":"""+str(portval)+""" -d my-container'"""
 
                 else:
                     downloadline="su - ec2-user -c 'cd /home/ec2-user && git clone https://github.com/baileytec-labs/llama-anywhere.git'"
