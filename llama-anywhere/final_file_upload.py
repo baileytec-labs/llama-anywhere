@@ -190,11 +190,13 @@ def main():
     #with open(LOCALMODEL, 'rb') as data:
     #    s3_client.upload_fileobj(data, bucket_name, LOCALMODEL.split("/")[-1])
     config_payload={}
-    invoke_payload = {
+    invoke_payload={}
+    
+    if 'Q' in deploytype.upper():
+        invoke_payload = {
         "prompt": "Context: In a small town named Grandville, a well-known millionaire, Mr. Smith, has been mysteriously murdered at his mansion. No one has been able to solve the case yet. Detective Anderson, an old friend of Mr. Smith, has taken it upon himself to solve this case. Detective Anderson was just informed that Mr. Smith had received a strange letter the day before his death. Prompt: You are now the character of Detective Anderson. Here's what you need to do in this exercise: 1. Start by expressing your feelings about Mr. Smith's death to the local sheriff, considering your old friendship with him. 2. Then, ask the sheriff about the details of this strange letter. 3. Finally, suggest a theory about the possible connection between this letter and Mr. Smith's death, and propose your next steps in the investigation. ",
         
     }
-    if 'Q' in deploytype.upper():
         if not is_url(selectedmodel):
 
             multipart_upload_with_s3(selectedmodel, bucket_name, selectedmodel.split("/")[-1])
@@ -208,6 +210,10 @@ def main():
         config_payload['n_ctx']=CONTEXT
         invoke_payload['max_tokens']=TOKENRESPONSE
     if 'F' in deploytype.upper():
+        invoke_payload = {
+        "input_text": "Context: In a small town named Grandville, a well-known millionaire, Mr. Smith, has been mysteriously murdered at his mansion. No one has been able to solve the case yet. Detective Anderson, an old friend of Mr. Smith, has taken it upon himself to solve this case. Detective Anderson was just informed that Mr. Smith had received a strange letter the day before his death. Prompt: You are now the character of Detective Anderson. Here's what you need to do in this exercise: 1. Start by expressing your feelings about Mr. Smith's death to the local sheriff, considering your old friendship with him. 2. Then, ask the sheriff about the details of this strange letter. 3. Finally, suggest a theory about the possible connection between this letter and Mr. Smith's death, and propose your next steps in the investigation. ",
+        
+    }
         #we're not uploading with S3, so it makes things easier.
         config_payload['pretrained_model_name_or_path']=selectedmodel
         invoke_payload['max_new_tokens']=TOKENRESPONSE
