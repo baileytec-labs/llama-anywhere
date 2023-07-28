@@ -1,6 +1,7 @@
 import os
 import json
 import boto3
+from transformers import AutoModelForCausalLM
 from fastapi import FastAPI, HTTPException
 from starlette.responses import Response
 from pydantic import BaseModel, validator
@@ -34,7 +35,7 @@ if HF_AUTH_TOKEN is not None:
 #Initial config 
 
 TOKENIZER = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
-MODEL = AutoModel.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
+MODEL = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
 
 
 print(MODEL_TYPE)
@@ -168,7 +169,7 @@ async def configure(model_config_args: ModelConfig):
         # Filter out any kwargs that are not recognized by `from_pretrained`
         recognized_args = {k: v for k, v in model_config_args.dict().items() if k in ['pretrained_model_name_or_path', 'cache_dir', 'force_download', 'resume_download', 'proxies', 'use_auth_token', 'revision']}
         TOKENIZER = AutoTokenizer.from_pretrained(**recognized_args)
-        MODEL = AutoModel.from_pretrained(**recognized_args)
+        MODEL = AutoModelForCausalLM.from_pretrained(**recognized_args)
         
         return {"status": "success"}
     except:
