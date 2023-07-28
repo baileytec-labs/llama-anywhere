@@ -50,9 +50,9 @@ class ModelConfig(BaseModel):
     proxies: Optional[Dict[str, str]] = None
     token: Optional[Union[str, bool]] = None
     revision: Optional[str] = "main"
-    return_unused_kwargs: Optional[bool] = False
+    # return_unused_kwargs: Optional[bool] = False  # Remove this line
     subfolder: Optional[str] = ""
-    kwargs: Optional[Dict[str, Any]] = None
+    kwargs: Optional[Dict[str, Any]] = None  # If this dict contains 'return_unused_kwargs', ensure it's not duplicated
 
 
 
@@ -165,8 +165,10 @@ async def configure(model_config_args: ModelConfig):
     try:
         global TOKENIZER
         global MODEL
-        TOKENIZER = AutoTokenizer.from_pretrained(**model_config_args.dict())
-        MODEL = AutoModel.from_pretrained(**model_config_args.dict())
+        # Filter out any kwargs that are not recognized by `from_pretrained`
+        recognized_args = {k: v for k, v in model_config_args.dict().items() if k in ['pretrained_model_name_or_path', 'cache_dir', 'force_download', 'resume_download', 'proxies', 'use_auth_token', 'revision']}
+        TOKENIZER = AutoTokenizer.from_pretrained(**recognized_args)
+        MODEL = AutoModel.from_pretrained(**recognized_args)
         
         return {"status": "success"}
     except:
