@@ -22,18 +22,27 @@ MODEL_TYPE=os.environ.get("MODEL_TYPE")
 SAVEPATH=os.environ.get("SAVE_PATH")
 STAGE = os.environ.get('STAGE', None)
 OPENAPI_PREFIX = f"/{STAGE}" if STAGE else "/"
-
+HF_AUTH_TOKEN=os.environ.get('HF_AUTH_TOKEN')
 
 app = FastAPI(title="Sagemaker Endpoint LLM API for HuggingFace Models", openapi_prefix=OPENAPI_PREFIX)
 
-TOKENIZER = AutoTokenizer.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH)
-MODEL = AutoModel.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH)
+
+if HF_AUTH_TOKEN is not None:
+    if len(HF_AUTH_TOKEN) <1:
+        os.environ['HF_AUTH_TOKEN']=None
+        HF_AUTH_TOKEN = os.environ.get(HF_AUTH_TOKEN)
+#Initial config 
+
+TOKENIZER = AutoTokenizer.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
+MODEL = AutoModel.from_pretrained(MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
+
 
 print(MODEL_TYPE)
 print(SAVEPATH)
 
 class ModelConfig(BaseModel):
     pretrained_model_name: Union[str, Path]
+    use_auth_token:Optional[str]=os.environ.get('HF_AUTH_TOKEN')
     config_file_name: Optional[Union[str, Path]] = "generation_config.json"
     cache_dir: Optional[Union[str, Path]] = SAVEPATH
     force_download: Optional[bool] = False
