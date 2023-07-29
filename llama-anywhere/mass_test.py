@@ -3,6 +3,8 @@ import subprocess
 import boto3
 import random
 import traceback
+import platform
+
 
 def list_instance_types(numinstances=10, instanceset=None):
     #There doesn't seem to be a quick and easy way to return all the instance types. so I'll just have lists.
@@ -354,6 +356,19 @@ def list_instance_types(numinstances=10, instanceset=None):
     
     return returninstances
 
+def is_windows():
+    return platform.system().lower() == 'windows'
+
+def run_powershell_script(deploytype, port, model, instance_type,hftoken):
+    command = ["powershell.exe", ".\\end2endtest.ps1", 
+               "-deploytype", deploytype, 
+               "-port", str(port), 
+               "-model", model, 
+               "-instancetype", instance_type,
+               '-huggingface_token',hftoken]
+    subprocess.check_call(command)
+
+
 def run_shell_script(deploytype, port, model, instance_type,hftoken):
     command = ["bash", "end2endtest.sh", 
                "-d", deploytype, 
@@ -367,7 +382,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--foundationmodel",required=False, type=str,default="VMware/open-llama-7b-v2-open-instruct", help="Huggingface transformer compatible repository path (VMware/open-llama-7b-v2-open-instruct)")
     parser.add_argument("--quantizedmodel", required=False, type=str,default="https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin",help="URL or path to the quantized model (https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin)")
-    parser.add_argument("--instancetype",type=str,default=None,required=False, help="Specify the instance you'd like to test against" )
+    parser.add_argument("--instancetype",type=str,default=None,required=False, help="Specify the instance you'd like to test against. Provide a comma delineated list if multiple instances selected." )
     parser.add_argument("--instanceclass",type=str,default=None,required=False, help="Specify the instance class to select from. Selects random at default. Choose from 'gpu_instances','m_instances','t_instances','r_instances','c_instances','all', " )
     parser.add_argument("--instancecount",type=int,default=10,required=False, help="Specify the number of instances you want to pull from the instance class. Default 10" )
     parser.add_argument("--hftoken",type=str,default="",required=False,help="Token for huggingface in order to download private models.")
@@ -377,15 +392,19 @@ def main():
     if args.instancetype is None:
         instance_types = list_instance_types(args.instancecount,args.instanceclass) 
     else:
-        instance_types=[args.instancetype]
+        instance_types=args.instancetype.split(",")
+        #instance_types=[args.instancetype]
 
     for instance_type in instance_types:
         try:
-            # Run shell script for foundation model
-            run_shell_script('f', port, args.foundationmodel, instance_type,args.hftoken)
+            # Run shell script for foundation model and for the quantized model
 
-            # Run shell script for quantized model
-            run_shell_script('q', port, args.quantizedmodel, instance_type,args.hftoken)
+            if is_windows():
+                run_powershell_script('f', port, args.foundationmodel, instance_type,args.hftoken)
+                run_powershell_script('q', port, args.quantizedmodel, instance_type,args.hftoken)
+            else:
+                run_shell_script('f', port, args.foundationmodel, instance_type,args.hftoken)
+                run_shell_script('q', port, args.quantizedmodel, instance_type,args.hftoken)
         except:
             print(traceback.format_exc())
 

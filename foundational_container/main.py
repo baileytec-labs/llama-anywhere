@@ -33,10 +33,13 @@ if HF_AUTH_TOKEN is not None:
         os.environ['HF_AUTH_TOKEN']=None
         HF_AUTH_TOKEN = os.environ.get(HF_AUTH_TOKEN)
 #Initial config 
-
-TOKENIZER = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
-MODEL = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
-
+TOKENIZER=None
+MODEL = None
+try:
+    TOKENIZER = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
+    MODEL = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
+except Exception as e:
+    print(e) #I'm doing a lazy way of handling initial configuration, just in case the user does not provide an initial model and instead wishes to provide it in configuration later.
 
 print(MODEL_TYPE)
 print(SAVEPATH)

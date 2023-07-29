@@ -228,18 +228,14 @@ def main():
     #We want to calculate and record the total cost. Billed at 60 second minimum durations.
 
     #We know that the EC2 instance doesn't finish the installation despite cloudformation finishing standing up the instance. 
-    trycounter=20
+    trycounter=30 #retrying every 30 seconds to give the container chance to build this many times...
     while True:
         try:
             starttime=time.time()
             ping_response = requests.get(f"{public_ip}/ping")
             endtime=time.time()
             roundtrip=endtime-starttime
-            if roundtrip/60 < 1:
-                totalcost=1
-            else:
-                totalcost=roundtrip/60
-            totalcost=(float(totalcost) * float(instanceprice)) / 60
+            totalcost=(float(roundtrip) * float(instanceprice)) / 3600
             logger.info(ping_response.status_code)  # Print the response status code
             logdict={
                 "Action":"Ping response",
@@ -285,12 +281,8 @@ def main():
         #logger.info(config_response.json())  # Print the response from the server
         endtime=time.time()
         roundtrip=endtime-starttime
-        if roundtrip/60 < 1:
-            totalcost=1
-        else:
-            totalcost=roundtrip/60
-        totalcost=(float(totalcost) * float(instanceprice)) / 60
-        logger.info(ping_response.status_code)  # Print the response status code
+        totalcost=(float(roundtrip) * float(instanceprice)) / 3600
+        #logger.info(ping_response.status_code)  # Print the response status code
         logdict={
             "Action":"Configuration",
             "roundtrip_time":roundtrip,
@@ -317,12 +309,8 @@ def main():
         #logger.info(invoke_response.json())  # Print the response from the server
         endtime=time.time()
         roundtrip=endtime-starttime
-        if roundtrip/60 < 1:
-            totalcost=1
-        else:
-            totalcost=roundtrip/60
-        totalcost=(float(totalcost) * float(instanceprice)) / 60
-        logger.info(ping_response.status_code)  # Print the response status code
+        totalcost=(float(roundtrip) * float(instanceprice)) / 3600
+        #logger.info(ping_response.status_code)  # Print the response status code
         logdict={
             "Action":"Invocation",
             "roundtrip_time":roundtrip,
