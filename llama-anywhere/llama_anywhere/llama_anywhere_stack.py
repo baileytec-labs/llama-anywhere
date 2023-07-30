@@ -219,14 +219,12 @@ class LlamaAnywhereStack(Stack):
         instance = ec2.CfnInstance(
             self, "Instance",
             instance_type=instance_type,
-            #here is a bit of a pickle. I need to have this determine automatically if this is going to be an x86 or arm processor and select an image id.
-            #We could also have the user specify it as well...
             image_id=IMAGEID,
             subnet_id=vpc.public_subnets[0].subnet_id,
             iam_instance_profile=instance_profile.ref,
             security_group_ids=[sg.security_group_id],
             user_data=cdk.Fn.base64(user_data.render()),
-            key_name="shabadedoo",  # replace this with the name of your key pair
+            #key_name="",  # replace this with the name of your key pair
             block_device_mappings=[  # attach a 200 GB EBS volume
                 {
                     "deviceName": "/dev/xvda",  # this can be different depending on your AMI
