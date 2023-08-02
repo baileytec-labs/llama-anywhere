@@ -1,5 +1,8 @@
 # Llama-Anywhere: Quantized Models Performance Analysis Simplified
 
+⚠️ FOR EDUCATIONAL PURPOSES ONLY ⚠️
+
+Docker images, code, buildspecs, and guidance provided as proof of concept only and for educational purposes only.
 
 ## Overview
 
@@ -46,3 +49,9 @@ The primary goal of Llama-Anywhere is to facilitate effortless, realistic compar
 ## Contributing
 
 While this repo makes great strides at being comprehensive, it is by no means exhaustive. Any contributions are welcome to improve and expand the functionality found here. Please review the `CONTRIBUTION.md` contribution guidelines to join in on this project!
+
+# <a name="connect"></a> 🔗 Connect with me
+
+<a href="https://www.baileytec.net" target="_blank"><img alt="Website" src="https://img.shields.io/badge/Personal%20Website-%2312100E.svg?&style=for-the-badge&logoColor=white" /></a>
+<a href="https://medium.com/@seanbailey518" target="_blank"><img alt="Medium" src="https://img.shields.io/badge/medium-%2312100E.svg?&style=for-the-badge&logo=medium&logoColor=white" /></a>
+<a href="https://www.linkedin.com/in/baileytec/" target="_blank"><img alt="LinkedIn" src="https://img.shields.io/badge/linkedin-%230077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" /></a>
