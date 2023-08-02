@@ -82,7 +82,7 @@ This stack deploys an EC2 instance in an Amazon VPC along with an S3 bucket. The
 1. Clone this repository.
 
 ```
-git clone https://github.com/<your-repo>/<your-project>.git
+git clone https://github.com/baileytec-labs/llama-anywhere.git
 
 ```
 
@@ -90,7 +90,7 @@ git clone https://github.com/<your-repo>/<your-project>.git
 2. Change into the directory for the project.
 
 ```
-cd <your-project>
+cd llama-anywhere
 
 
 ```
