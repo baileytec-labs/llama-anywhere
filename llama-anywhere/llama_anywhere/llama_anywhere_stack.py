@@ -134,34 +134,14 @@ class LlamaAnywhereStack(Stack):
         vpc = ec2.Vpc(self, "MyVPC", max_azs=2)
 
         # Define a new IAM Role with S3 full access policy
-        #role = iam.Role(self, "MyRole",
-        #                assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"))#
-        #bucket.grant_read_write(role)
+        role = iam.Role(self, "MyRole",
+                        assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"))
 
-        #instance_profile = iam.CfnInstanceProfile(self, "InstanceProfile",
-        #                                          roles=[role.role_name])
-        #instance_profile.add_depends_on(role)
-        
-        #Try to make it compatible with more environments.
-        cfn_role = iam.CfnRole(
-            self, "CfnRole",
-            assume_role_policy_document={
-                "Version": "2012-10-17",
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Principal": {"Service": "ec2.amazonaws.com"},
-                    "Action": "sts:AssumeRole"
-                }]
-            }
-        )
-
-        bucket.grant_read_write(iam.Role.from_role_arn(self, 'ImportedRole', cfn_role.attr_arn))
+        bucket.grant_read_write(role)
 
         instance_profile = iam.CfnInstanceProfile(self, "InstanceProfile",
-                                                  roles=[cfn_role.ref])
-        instance_profile.add_depends_on(cfn_role)
+                                                  roles=[role.role_name])
 
-        
         # Define a new security group
         sg = ec2.SecurityGroup(
             self, "SecurityGroup",
