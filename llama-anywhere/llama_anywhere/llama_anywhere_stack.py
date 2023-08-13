@@ -141,7 +141,7 @@ class LlamaAnywhereStack(Stack):
 
         instance_profile = iam.CfnInstanceProfile(self, "InstanceProfile",
                                                   roles=[role.role_name])
-
+        instance_profile.add_depends_on(role)
         # Define a new security group
         sg = ec2.SecurityGroup(
             self, "SecurityGroup",
