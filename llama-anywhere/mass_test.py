@@ -4,6 +4,9 @@ import boto3
 import random
 import traceback
 import platform
+import boto3
+from botocore.exceptions import ClientError
+
 
 
 def list_instance_types(numinstances=10, instanceset=None):
@@ -369,6 +372,27 @@ def run_powershell_script(deploytype, port, model, instance_type,hftoken):
     subprocess.check_call(command)
 
 
+
+def delete_buckets_with_prefix(prefix):
+    s3 = boto3.client('s3')
+    buckets = s3.list_buckets()['Buckets']
+
+    for bucket in buckets:
+        bucket_name = bucket['Name']
+        if bucket_name.startswith(prefix):
+            try:
+                # Delete all objects in the bucket first
+                bucket_resource = boto3.resource('s3').Bucket(bucket_name)
+                bucket_resource.objects.all().delete()
+
+                # Delete the bucket
+                s3.delete_bucket(Bucket=bucket_name)
+                print(f"Deleted bucket: {bucket_name}")
+            except ClientError as e:
+                print(f"Error deleting bucket {bucket_name}: {e}")
+
+
+
 def run_shell_script(deploytype, port, model, instance_type,hftoken):
     command = ["bash", "end2endtest.sh", 
                "-d", deploytype, 
@@ -407,6 +431,9 @@ def main():
                 run_shell_script('q', port, args.quantizedmodel, instance_type,args.hftoken)
         except:
             print(traceback.format_exc())
+        delete_buckets_with_prefix('llama-anywhere-bucket')
+
+
 
 if __name__ == '__main__':
     main()

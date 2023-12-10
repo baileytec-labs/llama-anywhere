@@ -36,8 +36,8 @@ if HF_AUTH_TOKEN is not None:
 TOKENIZER=None
 MODEL = None
 try:
-    TOKENIZER = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN)
-    MODEL = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN)
+    TOKENIZER = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH, use_auth_token=HF_AUTH_TOKEN,trust_remote_code=True)
+    MODEL = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path=MODEL_TYPE,cache_dir=SAVEPATH,use_auth_token=HF_AUTH_TOKEN,trust_remote_code=True)
 except Exception as e:
     print(e) #I'm doing a lazy way of handling initial configuration, just in case the user does not provide an initial model and instead wishes to provide it in configuration later.
 
@@ -47,6 +47,7 @@ print(SAVEPATH)
 class ModelConfig(BaseModel):
     pretrained_model_name_or_path: Union[str, Path]
     use_auth_token:Optional[str]=os.environ.get('HF_AUTH_TOKEN')
+    trust_remote_code:Optional[bool]=True
     config_file_name: Optional[Union[str, Path]] = "generation_config.json"
     cache_dir: Optional[Union[str, Path]] = SAVEPATH
     force_download: Optional[bool] = False
