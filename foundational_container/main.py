@@ -160,9 +160,10 @@ async def invoke(model_args: ModelArguments):
             print(f"{i}: {TOKENIZER.decode(outdata)}")
             finaloutdata[i]=TOKENIZER.decode(outdata)
         output=finaloutdata
+        output["model_args"]=str(model_args)
 
     except:
-        output={"traceback_err":str(traceback.format_exc())}
+        output={"traceback_err":str(traceback.format_exc()),"model_args":str(model_args)}
     return output
 
 @app.post("/configure")
