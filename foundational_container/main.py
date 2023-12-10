@@ -171,7 +171,7 @@ async def configure(model_config_args: ModelConfig):
         global TOKENIZER
         global MODEL
         # Filter out any kwargs that are not recognized by `from_pretrained`
-        recognized_args = {k: v for k, v in model_config_args.dict().items() if k in ['pretrained_model_name_or_path', 'cache_dir', 'force_download', 'resume_download', 'proxies', 'use_auth_token', 'revision']}
+        recognized_args = {k: v for k, v in model_config_args.dict().items() if k in ['pretrained_model_name_or_path', 'cache_dir', 'force_download', 'resume_download', 'proxies', 'use_auth_token', 'revision','trust_remote_code']}
         TOKENIZER = AutoTokenizer.from_pretrained(**recognized_args)
         MODEL = AutoModelForCausalLM.from_pretrained(**recognized_args)
         
