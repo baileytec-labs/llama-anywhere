@@ -113,9 +113,9 @@ class ModelArguments(BaseModel):
     return_dict_in_generate: bool = False
 
     # Special tokens parameters
-    pad_token_id: Optional[int] = None
-    bos_token_id: Optional[int] = None
-    eos_token_id: Optional[int] = None
+    #pad_token_id: Optional[int] = None
+    #bos_token_id: Optional[int] = None
+    #eos_token_id: Optional[int] = None
 
     # Encoder-decoder exclusive parameters
     encoder_no_repeat_ngram_size: int = 0
