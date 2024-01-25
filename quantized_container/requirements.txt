@@ -5,3 +5,4 @@ llama-cpp-python
 pydantic
 uvicorn
 requests
+tiktoken

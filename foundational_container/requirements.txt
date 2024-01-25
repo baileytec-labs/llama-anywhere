@@ -11,3 +11,4 @@ accelerator
 einops
 xformers
 requests
+tiktoken
