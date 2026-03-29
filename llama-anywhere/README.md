@@ -139,7 +139,7 @@ ___
 
 ## Overview
 
-This Bash script automates the process of setting up and deploying a Hugging Face foundational or llama.cpp compatible model, specifically the Llama-2-7B-GGML model, in an AWS cloud environment. It will deploy, test, record, and destroy the environment automatically. The script takes into account the deployment type, the port, instance type, model, and Hugging Face token.
+This Bash script automates the process of setting up and deploying a Hugging Face foundational or llama.cpp compatible model, specifically the Llama-2-7B-GGUF model, in an AWS cloud environment. It will deploy, test, record, and destroy the environment automatically. The script takes into account the deployment type, the port, instance type, model, and Hugging Face token.
 
 The script also creates a Python virtual environment, installs necessary dependencies, executes AWS CDK deployment commands, and runs a Python script `final_file_upload.py` which can be modified to perform any final tasks after deployment.
 
@@ -178,7 +178,7 @@ Example:
 
 
 ```
-./end2endtest.sh -d q -p 8080 -i t4g.xlarge -m https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q2_K.bin -h your_huggingface_token
+./end2endtest.sh -d q -p 8080 -i t4g.xlarge -m https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q2_K.gguf -h your_huggingface_token
 
 ```
 
