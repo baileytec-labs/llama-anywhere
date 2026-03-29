@@ -170,7 +170,7 @@ To run the script, navigate to the directory where the script is stored and prov
 * -d `<deploy_type>`: The type of deployment you want to carry out. The default value is "q".
 * -p `<port>`: The port number for your application. The default value is 8080.
 * -i `<instance_type>`: The AWS EC2 instance type to use. The default is "t4g.xlarge".
-* -m `<model_url>`: The URL of the model to deploy. The default model is "https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q2_K.bin".
+* -m `<model_url>`: The URL of the model to deploy. The default model is "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q2_K.gguf". Note: llama-cpp-python now requires GGUF format (GGML is no longer supported).
 * -h `<huggingface_token>`: Your Hugging Face token. This is required to authenticate and download the model.
 
 
@@ -210,7 +210,7 @@ python3 mass_test.py --foundationmodel <foundation_model_path> --quantizedmodel 
 ```
 
 * `--foundationmodel`: The path of the foundational model. Default is "VMware/open-llama-7b-v2-open-instruct".
-* `--quantizedmodel`: The URL or path of the quantized model. Default is "https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin".
+* `--quantizedmodel`: The URL or path of the quantized model. Default is "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q2_K.gguf". Note: llama-cpp-python now requires GGUF format (GGML is no longer supported).
 * `--instancetype`: The type of instance to test against. If multiple instances are selected, provide a comma-separated list. This is optional.
 * `--instanceclass`: The class of instance to select from. Options include 'gpu_instances', 'm_instances', 't_instances', 'r_instances', 'c_instances', 'all'. If not specified, a random class is selected.
 * `--instancecount`: The number of instances to pull from the instance class. Default is 10.

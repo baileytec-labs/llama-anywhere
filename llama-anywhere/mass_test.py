@@ -405,7 +405,7 @@ def run_shell_script(deploytype, port, model, instance_type,hftoken):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--foundationmodel",required=False, type=str,default="VMware/open-llama-7b-v2-open-instruct", help="Huggingface transformer compatible repository path (VMware/open-llama-7b-v2-open-instruct)")
-    parser.add_argument("--quantizedmodel", required=False, type=str,default="https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin",help="URL or path to the quantized model (https://huggingface.co/TheBloke/open-llama-7B-v2-open-instruct-GGML/resolve/main/open-llama-7b-v2-open-instruct.ggmlv3.q2_K.bin)")
+    parser.add_argument("--quantizedmodel", required=False, type=str,default="https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q2_K.gguf",help="URL or path to the quantized model (GGUF format, required by llama-cpp-python). Default: https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q2_K.gguf")
     parser.add_argument("--instancetype",type=str,default=None,required=False, help="Specify the instance you'd like to test against. Provide a comma delineated list if multiple instances selected." )
     parser.add_argument("--instanceclass",type=str,default=None,required=False, help="Specify the instance class to select from. Selects random at default. Choose from 'gpu_instances','m_instances','t_instances','r_instances','c_instances','all', " )
     parser.add_argument("--instancecount",type=int,default=10,required=False, help="Specify the number of instances you want to pull from the instance class. Default 10" )
